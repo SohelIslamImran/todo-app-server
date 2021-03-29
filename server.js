@@ -11,7 +11,7 @@ app.use(cors());
 const port = process.env.PORT || 5000;
 
 app.get('/', (req, res) => {
-    res.send('TodoList Server is Running')
+  res.send('TodoList Server is Running')
 })
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@database.1n8y8.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
@@ -21,6 +21,13 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 client.connect(err => {
   const todoList = client.db(`${process.env.DB_NAME}`).collection("TodoList");
 
+  app.get('/todoList', (req, res) => {
+    todoList.find({})
+      .toArray((err, docs) => {
+        res.send(docs.reverse())
+      })
+  })
+
   app.post('/addTodo', (req, res) => {
     const todo = req.body;
     todoList.insertOne(todo)
@@ -28,13 +35,6 @@ client.connect(err => {
         if (result.insertedCount > 0) {
           res.send(req.body);
         }
-      })
-  })
-
-  app.get('/todoList', (req, res) => {
-    todoList.find({})
-      .toArray((err, docs) => {
-        res.send(docs)
       })
   })
 
@@ -57,7 +57,7 @@ client.connect(err => {
   })
 
   app.patch('/completedTodo/:id', (req, res) => {
-    const { text, isComplete } = req.body[0]
+    const { text, isComplete } = req.body;
     todoList.updateOne(
       { _id: ObjectId(req.params.id) },
       {
