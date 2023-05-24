@@ -49,6 +49,17 @@ client.connect(err => {
     })
   })
 
+  app.patch('/updateLogout', (req, res) => {
+    todoList.updateMany(
+      { _id: ObjectId(req.params.id) },
+      {
+        $set: req.body
+      }
+    ).then(result => {
+      res.send(result.modifiedCount > 0)
+    })
+  })
+
   app.delete('/delete/:id', (req, res) => {
     todoList.deleteOne({ _id: ObjectId(req.params.id) })
       .then(result => {
